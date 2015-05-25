@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>Price</title>
+
+    <link href="../static/css/normalise.css" rel="stylesheet">
+    <link href="../static/css/skeleton.css" rel="stylesheet">
+    <link href="../static/css/c3.css" rel="stylesheet">
+
+    <script src="../static/js/d3.min.js" charset="utf-8"></script>
+    <script src="../static/js/c3.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div id="chart"></div>
+
+    <script>
+    var chart = c3.generate({
+        bindto: '#chart',
+        data: {
+          columns: [
+            ['data1', 30, 200, 100, 400, 150, 250]
+          ]
+        }
+    });
+    </script>
+</body>
+</html>
