@@ -77,9 +77,6 @@ class DataGrabber():
 
 class DBConnector():
 
-    def __init__(self):
-        pass
-
     def get_current_record(self, code):
         query = (PriceLog
                  .select()
@@ -88,6 +85,16 @@ class DBConnector():
                  .get())
 
         return query.asx_code, query.price, query.timestamp
+
+    def get_records_by_timeframe(self, code, start_time=(datetime.datetime.now() - datetime.timedelta(days=14)),
+                                 end_time=datetime.datetime.now()):
+
+        query = (PriceLog
+                 .select()
+                 .where((PriceLog.asx_code == code) & (PriceLog.timestamp > start_time) &
+                        (PriceLog.timestamp < end_time))
+                 .order_by(PriceLog.timestamp.desc()))
+        return query
 
 
 class PriceLog(BaseModel):

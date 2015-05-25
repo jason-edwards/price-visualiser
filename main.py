@@ -10,16 +10,37 @@ import sys
 app = Flask(__name__)
 datagrab_thread = None
 
-@app.route("/price/")
-@app.route("/price/<code>")
-def hello(code=None):
+@app.route("/table")
+@app.route("/table/<code>")
+def table(code=None):
     if code is None:
-        return "usage: ip_address/price/asx code"
+        return "usage: ip_address/table/asx code"
 
     data = DBConnector()
     code, price, timestamp = data.get_current_record(code)
-
     return render_template('price.html', code=code, price=price, timestamp=timestamp)
+
+
+@app.route("/graph")
+@app.route("/graph/<code>")
+def graph(code=None):
+    if code is None:
+        return "usage: ip_address/graph/asx code"
+
+    data = DBConnector()
+    query = data.get_records_by_timeframe(code)
+
+    prices = []
+    timestamps = []
+    for rows in query:
+        prices.append(float(rows.price))
+        timestamps.append(str(rows.timestamp))
+    prices.insert(0, "price")
+    timestamps.insert(0, "time")
+
+    print prices
+    print timestamps
+    return "Stuff"
 
 
 class DataGrabThread(threading.Thread):
