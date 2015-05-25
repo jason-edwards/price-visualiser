@@ -36,11 +36,12 @@ def graph(code=None):
         prices.append(float(rows.price))
         timestamps.append(str(rows.timestamp))
     prices.insert(0, "price")
-    timestamps.insert(0, "time")
+    timestamps.insert(0, "timestamps")
 
-    print prices
-    print timestamps
-    return "Stuff"
+    prices = prices[0:5]
+    timestamps = timestamps[0:5]
+
+    return render_template('graph.html', prices=str(prices), timestamps=str(timestamps))
 
 
 class DataGrabThread(threading.Thread):

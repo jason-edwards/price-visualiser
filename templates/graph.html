@@ -23,19 +23,21 @@
         bindto: '#chart',
         data: {
             x: 'timestamps',
+            x_format: '%Y-%m-%d %H:%M:%S',
             columns: [
-                {{ timestamps }},
-                {{ prices }}
-            ]
+                {{ timestamps|safe }},
+                {{ prices|safe }}
+            ],
+            type: 'spline'
         },
         axis: {
-        x: {
-            type: 'timeseries',
-            tick: {
-                format: '%Y-%m-%d %H:%M:%S'
+            x: {
+                type: 'timeseries',
+                tick: {
+                    format: '%Y-%m-%d'
+                }
             }
         }
-    }
     });
     </script>
 </body>
