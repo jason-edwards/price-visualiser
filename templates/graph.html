@@ -23,12 +23,11 @@
         bindto: '#chart',
         data: {
             x: 'timestamps',
-            x_format: '%Y-%m-%d %H:%M:%S',
+            xFormat: '%Y-%m-%d %H:%M:%S',
             columns: [
                 {{ timestamps|safe }},
                 {{ prices|safe }}
-            ],
-            type: 'spline'
+            ]
         },
         axis: {
             x: {
@@ -37,7 +36,14 @@
                     format: '%Y-%m-%d'
                 }
             }
+        },
+        point: {
+            show: false
+        },
+        zoom: {
+            enabled: true
         }
+
     });
     </script>
 </body>

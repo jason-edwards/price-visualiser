@@ -38,9 +38,6 @@ def graph(code=None):
     prices.insert(0, "price")
     timestamps.insert(0, "timestamps")
 
-    prices = prices[0:5]
-    timestamps = timestamps[0:5]
-
     return render_template('graph.html', prices=str(prices), timestamps=str(timestamps))
 
 
