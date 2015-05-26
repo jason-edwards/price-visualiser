@@ -54,6 +54,7 @@ class DataGrabThread(threading.Thread):
         while self.keep_running:
             for asx_code in asx_codes_array:
                 data_grabber.data_grab(asx_code)
+                data_grabber.historic_data_grab(asx_code)
             time.sleep(5)
 
 

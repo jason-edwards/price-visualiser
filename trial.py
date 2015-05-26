@@ -1,9 +1,10 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
-#import requests as req
+import requests as req
 import peewee as pw
 import datetime
 import platform
+import re
 
 
 DATABASE_USER = 'pricevis'
@@ -38,7 +39,6 @@ class DataGrabber():
                 browser = webdriver.PhantomJS()
             else:
                 browser = webdriver.PhantomJS('/home/ubuntu/Trial/price-visualiser/phantomjs')
-
             browser.get(url_string)
             browser.execute_script("return document.cookie")
             browser.execute_script("return navigator.userAgent")
@@ -84,6 +84,23 @@ class DataGrabber():
 
         price_log.save()
         return 0
+
+    def historic_data_grab(self, code):
+        url_string = "https://au.finance.yahoo.com/q/hp?s=" + code + ".AX"
+
+        page = req.get(url_string)
+        html_source = page.text
+
+        soup = BeautifulSoup(html_source)
+        search_id_string = 'rightcol'
+
+        print soup.find(id=search_id_string).find_all('a', href=re.compile('^http://real-chart.finance'))[0].get('href')
+"""
+        except AttributeError:
+            print "Attribute Error: bs4.find() could not retrieve text for %s." % asx_codes_array[i]
+            print "Check the status of the webpage."
+            pass
+"""
 
 
 class DBConnector():
