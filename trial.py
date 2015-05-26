@@ -5,7 +5,18 @@ import peewee as pw
 import datetime
 import platform
 
-db = pw.MySQLDatabase('shares_db', host='127.0.0.1', user='root', password='a113fea')
+
+DATABASE_USER = 'pricevis'
+
+
+try:
+    f = open(DATABASE_USER + '.passwd', 'r')
+    passwd = f.read()[:-1]
+except IOError:
+    print "Cannot open database password file. Password file should be named <db-user>.passwd"
+else:
+    f.close()
+db = pw.MySQLDatabase('shares_db', host='127.0.0.1', user=DATABASE_USER, password=passwd)
 
 
 class BaseModel(pw.Model):
@@ -26,7 +37,7 @@ class DataGrabber():
             if platform.system() == "Darwin":
                 browser = webdriver.PhantomJS()
             else:
-                browser = webdriver.PhantomJS('/home/ubuntu/Trial/phantomjs')
+                browser = webdriver.PhantomJS('/home/ubuntu/Trial/price-visualiser/phantomjs')
 
             browser.get(url_string)
             browser.execute_script("return document.cookie")
@@ -46,7 +57,7 @@ class DataGrabber():
                 if platform.system() == "Darwin":
                     browser = webdriver.PhantomJS()
                 else:
-                    browser = webdriver.PhantomJS('/home/ubuntu/Trial/phantomjs')
+                    browser = webdriver.PhantomJS('/home/ubuntu/Trial/price-visualiser/phantomjs')
 
                 browser.get(url_string)
                 browser.execute_script("return document.cookie")

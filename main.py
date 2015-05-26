@@ -52,8 +52,8 @@ class DataGrabThread(threading.Thread):
 #        asx_codes_array = ["cba"]
         data_grabber = DataGrabber()
         while self.keep_running:
-            for i in range(0, len(asx_codes_array)):
-                    data_grabber.data_grab(asx_codes_array[i])
+            for asx_code in asx_codes_array:
+                data_grabber.data_grab(asx_code)
             time.sleep(5)
 
 
