@@ -49,12 +49,11 @@ class DataGrabThread(threading.Thread):
 
     def run(self):
         asx_codes_array = ["anz", "cba", "wbc", "cim"]
-#        asx_codes_array = ["cba"]
+        #asx_codes_array = ["cba"]
         data_grabber = DataGrabber()
         while self.keep_running:
             for asx_code in asx_codes_array:
                 data_grabber.data_grab(asx_code)
-                data_grabber.historic_data_grab(asx_code)
             time.sleep(5)
 
 
@@ -82,9 +81,20 @@ if __name__ == "__main__":
             daemon.stop()
         elif 'restart' == sys.argv[1]:
             daemon.restart()
+        elif 'history' == sys.argv[1]:
+            print "usage: %s history code" % sys.argv[0]
+            sys.exit(2)
         else:
             print "Unknown command"
             sys.exit(2)
+    elif len(sys.argv) == 3:
+        data_grabber = DataGrabber()
+        result = data_grabber.historic_data_grab(sys.argv[2])
+        if result == 0:
+            print "Database populated with historic data for %s" % sys.argv[2]
+        elif result == 404:
+            print "Could not find file for \'%s\'." % sys.argv[2]
+            print "Check if code is valid."
     else:
         print "Not running as daemon!"
         print "usage: %s start|stop|restart" % sys.argv[0]

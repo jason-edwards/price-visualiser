@@ -5,6 +5,8 @@ import peewee as pw
 import datetime
 import platform
 import re
+import csv
+import urllib2
 
 
 DATABASE_USER = 'pricevis'
@@ -93,8 +95,57 @@ class DataGrabber():
 
         soup = BeautifulSoup(html_source)
         search_id_string = 'rightcol'
+        try:
+            file_url = (soup.find(id=search_id_string)
+                        .find_all('a', href=re.compile('^http://real-chart.finance'))[0].get('href'))
+        except AttributeError:
+            return 404
 
-        print soup.find(id=search_id_string).find_all('a', href=re.compile('^http://real-chart.finance'))[0].get('href')
+        csv_file = urllib2.urlopen(file_url)
+        reader = csv.reader(csv_file)
+
+        print "%s history read." % code
+        row_number = 0
+        skipped_array = []
+        for row in reader:
+            if row_number != 0:
+                # Columns are - Date, Open, High, Low, Close, Volume, Adjusted Close
+                date = row[0]
+
+                data = DBConnector()
+                query = data.get_records_by_date(code=code, date=date)
+
+                if query.count() == 0:
+                    # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+                    date_string = date + " 00:00:00"
+                    time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+
+                    price_log = PriceLog(
+                        asx_code=code,
+                        price=row[1],
+                        timestamp=time
+                    )
+
+                    price_log.save()
+
+                    # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+                    date_string = date + " 06:00:00"
+                    time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+
+                    price_log = PriceLog(
+                        asx_code=code,
+                        price=row[4],
+                        timestamp=time
+                    )
+
+                    price_log.save()
+                else:
+                    skipped_array.append(date)
+
+            row_number += 1
+        print len(skipped_array), "items skipped for", code
+        return 0
+
 """
         except AttributeError:
             print "Attribute Error: bs4.find() could not retrieve text for %s." % asx_codes_array[i]
@@ -123,6 +174,20 @@ class DBConnector():
                         (PriceLog.timestamp < end_time))
                  .order_by(PriceLog.timestamp.desc()))
         return query
+
+    def get_records_by_date(self, code, date):
+
+        date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        start_time = date
+        end_time = date + datetime.timedelta(days=1)
+
+        query = (PriceLog
+                 .select()
+                 .where((PriceLog.asx_code == code) & (PriceLog.timestamp > start_time) &
+                        (PriceLog.timestamp < end_time))
+                 .order_by(PriceLog.timestamp.desc()))
+        return query
+
 
 
 class PriceLog(BaseModel):
