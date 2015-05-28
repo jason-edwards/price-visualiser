@@ -11,7 +11,6 @@ import urllib2
 
 DATABASE_USER = 'pricevis'
 
-
 try:
     f = open(DATABASE_USER + '.passwd', 'r')
     passwd = f.read()[:-1]
@@ -99,6 +98,8 @@ class DataGrabber():
             file_url = (soup.find(id=search_id_string)
                         .find_all('a', href=re.compile('^http://real-chart.finance'))[0].get('href'))
         except AttributeError:
+            print "Attribute Error: bs4.find() could not retrieve text for %s." % code
+            print "Check the status of the webpage."
             return 404
 
         csv_file = urllib2.urlopen(file_url)
@@ -106,52 +107,43 @@ class DataGrabber():
 
         print "%s history read." % code
         row_number = 0
-        skipped_array = []
+        data_array = []
+
+        # Construct data_array to contain dictionary of price_log data.
         for row in reader:
             if row_number != 0:
                 # Columns are - Date, Open, High, Low, Close, Volume, Adjusted Close
-                date = row[0]
 
-                data = DBConnector()
-                query = data.get_records_by_date(code=code, date=date)
+                # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+                date_string = row[0] + " 00:00:00"
+                time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
 
-                if query.count() == 0:
-                    # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
-                    date_string = date + " 00:00:00"
-                    time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+                data = {'asx_code': code, 'price': row[1], 'timestamp': time}
+                data_array.append(data)
 
-                    price_log = PriceLog(
-                        asx_code=code,
-                        price=row[1],
-                        timestamp=time
-                    )
+                # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+                date_string = row[0] + " 06:00:00"
+                time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
 
-                    price_log.save()
-
-                    # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
-                    date_string = date + " 06:00:00"
-                    time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-
-                    price_log = PriceLog(
-                        asx_code=code,
-                        price=row[4],
-                        timestamp=time
-                    )
-
-                    price_log.save()
-                else:
-                    skipped_array.append(date)
-
+                data = {'asx_code': code, 'price': row[4], 'timestamp': time}
+                data_array.append(data)
             row_number += 1
+
+        db_instance = DBConnector()
+        insert_array = []
+        skipped_array = []
+        for element in data_array:
+            query = db_instance.get_records_by_date(code=element['asx_code'], date=element['timestamp'])
+            if query.count() == 0:
+                insert_array.append(element)
+            else:
+                skipped_array.append(element)
+
+        PriceLog.insert_many(insert_array).execute()
+
+        print len(insert_array), "items inserted"
         print len(skipped_array), "items skipped for", code
         return 0
-
-"""
-        except AttributeError:
-            print "Attribute Error: bs4.find() could not retrieve text for %s." % asx_codes_array[i]
-            print "Check the status of the webpage."
-            pass
-"""
 
 
 class DBConnector():
@@ -177,7 +169,11 @@ class DBConnector():
 
     def get_records_by_date(self, code, date):
 
-        date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        try:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d")
+        except TypeError:
+            date = date.replace(hour=0, minute=0, second=0, microsecond=0)
+
         start_time = date
         end_time = date + datetime.timedelta(days=1)
 
