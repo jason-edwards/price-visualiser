@@ -217,6 +217,9 @@ class DBConnector():
     def get_records_by_timeframe(self, code, start_time=(datetime.datetime.now() - datetime.timedelta(days=14)),
                                  end_time=datetime.datetime.now()):
 
+        start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_time = end_time.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)t
+
         query = (PriceLog
                  .select()
                  .where((PriceLog.asx_code == code) & (PriceLog.timestamp > start_time) &
