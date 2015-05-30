@@ -106,6 +106,64 @@ class DataGrabber():
         reader = csv.reader(csv_file)
 
         print "%s history read." % code
+        data_array = []
+
+        # Construct data_array to contain dictionary of price_log data.
+        reader.next()
+        for row in reader:
+            # Columns are - Date, Open, High, Low, Close, Volume, Adjusted Close
+
+            # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+            date_string = row[0] + " 00:00:00"
+            time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+
+            data = {'asx_code': code, 'price': row[1], 'timestamp': time}
+            data_array.append(data)
+
+            # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+            date_string = row[0] + " 06:00:00"
+            time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+
+            data = {'asx_code': code, 'price': row[4], 'timestamp': time}
+            data_array.append(data)
+
+        db_instance = DBConnector()
+        insert_array = []
+        skipped_array = []
+        for element in data_array:
+            query = db_instance.get_records_by_date(code=element['asx_code'], date=element['timestamp'])
+            if query.count() == 0:
+                insert_array.append(element)
+            else:
+                skipped_array.append(element)
+
+        if len(insert_array) != 0:
+            PriceLog.insert_many(insert_array).execute()
+
+        print len(insert_array), "items inserted"
+        print len(skipped_array), "items skipped for", code
+        return 0
+
+    def historic_data_grab_alt(self, code):
+        url_string = "https://au.finance.yahoo.com/q/hp?s=" + code + ".AX"
+
+        page = req.get(url_string)
+        html_source = page.text
+
+        soup = BeautifulSoup(html_source)
+        search_id_string = 'rightcol'
+        try:
+            file_url = (soup.find(id=search_id_string)
+                        .find_all('a', href=re.compile('^http://real-chart.finance'))[0].get('href'))
+        except AttributeError:
+            print "Attribute Error: bs4.find() could not retrieve text for %s." % code
+            print "Check the status of the webpage."
+            return 404
+
+        csv_file = urllib2.urlopen(file_url)
+        reader = csv.reader(csv_file)
+
+        print "%s history read." % code
 
         db_instance = DBConnector()
         insert_array = []

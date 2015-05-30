@@ -88,8 +88,15 @@ if __name__ == "__main__":
             print "Unknown command"
             sys.exit(2)
     elif len(sys.argv) == 3:
-        data_grabber = DataGrabber()
-        result = data_grabber.historic_data_grab(sys.argv[2])
+        if 'history' == sys.argv[1]:
+            data_grabber = DataGrabber()
+            result = data_grabber.historic_data_grab(sys.argv[2])
+        elif 'history_alt' == sys.argv[1]:
+            data_grabber = DataGrabber()
+            result = data_grabber.historic_data_grab_alt(sys.argv[2])
+        else:
+            "Problems aye..."
+
         if result == 0:
             print "Database populated with historic data for %s" % sys.argv[2]
         elif result == 404:
