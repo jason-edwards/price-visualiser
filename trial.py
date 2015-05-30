@@ -106,40 +106,39 @@ class DataGrabber():
         reader = csv.reader(csv_file)
 
         print "%s history read." % code
-        row_number = 0
-        data_array = []
-
-        # Construct data_array to contain dictionary of price_log data.
-        for row in reader:
-            if row_number != 0:
-                # Columns are - Date, Open, High, Low, Close, Volume, Adjusted Close
-
-                # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
-                date_string = row[0] + " 00:00:00"
-                time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-
-                data = {'asx_code': code, 'price': row[1], 'timestamp': time}
-                data_array.append(data)
-
-                # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
-                date_string = row[0] + " 06:00:00"
-                time = datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-
-                data = {'asx_code': code, 'price': row[4], 'timestamp': time}
-                data_array.append(data)
-            row_number += 1
 
         db_instance = DBConnector()
         insert_array = []
         skipped_array = []
-        for element in data_array:
-            query = db_instance.get_records_by_date(code=element['asx_code'], date=element['timestamp'])
-            if query.count() == 0:
-                insert_array.append(element)
-            else:
-                skipped_array.append(element)
+        row_data_array = [("1000-1-1 00:00:00", 0), ("1000-1-1 00:00:00", 0)]
 
-        PriceLog.insert_many(insert_array).execute()
+        # Skip header row
+        reader.next()
+
+        # CSV Columns are - Date, Open, High, Low, Close, Volume, Adjusted Close
+        # Construct data_array to contain dictionary of price_log data.
+        for row in reader:
+            # Create tuples: (time, price)
+
+            # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+            row_data_array[0] = (row[0] + " 00:00:00", row[1])
+
+            # Add in database for the price at open. The time is 10:00:00 AEST -> 00:00:00 UTC
+            row_data_array[1] = (row[0] + " 06:00:00", row[4])
+
+            for row_data in row_data_array:
+                time = datetime.datetime.strptime(row_data[0], "%Y-%m-%d %H:%M:%S")
+
+                data = {'asx_code': code, 'price': row_data[1], 'timestamp': time}
+
+                query = db_instance.get_records_by_date(code=data['asx_code'], date=data['timestamp'])
+                if query.count() == 0:
+                    insert_array.append(data)
+                else:
+                    skipped_array.append(data)
+
+        if len(insert_array) != 0:
+            PriceLog.insert_many(insert_array).execute()
 
         print len(insert_array), "items inserted"
         print len(skipped_array), "items skipped for", code
