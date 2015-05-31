@@ -218,7 +218,7 @@ class DBConnector():
                                  end_time=datetime.datetime.now()):
 
         start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_time = end_time.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)t
+        end_time = end_time.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
 
         query = (PriceLog
                  .select()
