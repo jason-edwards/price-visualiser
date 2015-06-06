@@ -56,6 +56,11 @@ class DataGrabber():
         print "\tTook %.2f seconds to get response." % requestTime
 
         soup = BeautifulSoup(html_source)
+        if soup == None:
+            print "Error making soup."
+            print html_source
+            return 1
+
         if url == url_list[0]:
             prices_table = soup.find("table").find("tbody")
             current_price = prices_table.find_all("td")[0].get_text()
