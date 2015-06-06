@@ -78,7 +78,7 @@ class DataGrabber():
                 print "Check the status of the webpage."
                 pass
         scrapeTime = clock() - startTime
-        print "\t" + code + "\t" + current_price + "\t" + str(scapeTime)
+        print "\t" + code + "\t" + current_price + "\t" + str(scrapeTime)
 
         price_log = PriceLog(
             asx_code=code,

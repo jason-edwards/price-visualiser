@@ -101,8 +101,8 @@ class MyDaemon(Daemon):
 
 if __name__ == "__main__":
 
-    daemon = MyDaemon('/tmp/daemon-example.pid')
     if len(sys.argv) == 2:
+        daemon = MyDaemon('/tmp/daemon-example.pid')
         if 'start' == sys.argv[1]:
             print "Starting as daemon."
             daemon.start()
@@ -145,4 +145,5 @@ if __name__ == "__main__":
         print "Waiting for datagrab thread"
         datagrab_thread.keep_running = False
         datagrab_thread.join()
+
     print "Exiting"
