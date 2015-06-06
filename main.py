@@ -7,9 +7,13 @@ import platform
 import time
 import sys
 
+WEB_PORT = 5000 if platform.system() == "Darwin" else 80
+DATAGRAB_SLEEP_TIME = 10 # seconds between each round of data grabbing
+
 app = Flask(__name__)
-app.debug = True
+#app.debug = True
 datagrab_thread = None
+
 
 @app.route("/table")
 @app.route("/table/<code>")
@@ -70,6 +74,7 @@ def graph(code=None, time_frame=None):
 
 
 class DataGrabThread(threading.Thread):
+
     def __init__(self):
         threading.Thread.__init__(self)
         self.keep_running = True
@@ -81,26 +86,23 @@ class DataGrabThread(threading.Thread):
         data_grabber = DataGrabber()
         print "Starting datagrab thread loop. This message should only appear once."
         while self.keep_running:
+            seconds = 0
             for asx_code in asx_codes_array:
                 print "Executing datagrab(" + asx_code + ")"
                 data_grabber.data_grab(asx_code)
-            print "Sleeping thread."
-            time.sleep(5)
-
-
-def web_service():
-    port = 80
-    if platform.system() == "Darwin":
-        port = 5000
-
-    app.run(host='0.0.0.0', port=port)
+            print "Sleeping."
+            while seconds < DATAGRAB_SLEEP_TIME and self.keep_running:
+                time.sleep(1)
+                seconds += 1
+        data_grabber.cleanup()
 
 
 class MyDaemon(Daemon):
     def run(self):
         datagrab_thread = DataGrabThread()
         datagrab_thread.start()
-        web_service()
+        app.run(host='0.0.0.0', port=WEB_PORT)
+
 
 if __name__ == "__main__":
     argc = len(sys.argv)
@@ -119,7 +121,7 @@ if __name__ == "__main__":
             print "usage: %s history code" % sys.argv[0]
             sys.exit(2)
         else:
-            print "Unknown command"
+            print "usage: %s start|stop|restart\n" % sys.argv[0]
             sys.exit(2)
     elif argc == 3:
         if 'history' == sys.argv[1]:
@@ -129,7 +131,7 @@ if __name__ == "__main__":
             data_grabber = DataGrabber()
             result = data_grabber.historic_data_grab_alt(sys.argv[2])
         else:
-            "Problems aye..."
+            print "Problems aye..."
 
         if result == 0:
             print "Database populated with historic data for %s" % sys.argv[2]
@@ -138,15 +140,13 @@ if __name__ == "__main__":
             print "Check if code is valid."
     else:
         print "Not running as daemon!"
-        print "usage: %s start|stop|restart\n" % sys.argv[0]
-
         datagrab_thread = DataGrabThread()
         datagrab_thread.start()
-        web_service()
+        app.run(host='0.0.0.0', port=WEB_PORT)
 
     if datagrab_thread is not None:
         print "Waiting for datagrab thread"
         datagrab_thread.keep_running = False
         datagrab_thread.join()
 
-    print "Exiting"
+print "Exiting"

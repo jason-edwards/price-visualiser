@@ -7,8 +7,7 @@ import platform
 import re
 import csv
 import urllib2
-from time import clock
-
+from time import time
 
 DATABASE_USER = 'pricevis'
 
@@ -30,70 +29,55 @@ class BaseModel(pw.Model):
 class DataGrabber():
 
     def __init__(self):
-        pass
+        self.browser = webdriver.PhantomJS('./phantomjs') if platform.system() != "Darwin" else webdriver.PhantomJS()
+
+    def cleanup(self):
+        self.browser.close()
 
     def data_grab(self, code):
-        print "** Datagrab beginning for " + code + " **"
-        startTime = clock()
+        startTime = time()
         current_price = 0
-        try:
-            print "\tGetting asx price."
-            url_string = "http://search.asx.com.au/s/search.html?query=" + code + "&collection=asx-meta&profile=web"
+        url_list = ["http://search.asx.com.au/s/search.html?query=" + code + "&collection=asx-meta&profile=web", "https://au.finance.yahoo.com/q/pr?s=" + code + ".AX"]
+        print "\tGetting asx price."
 
-            if platform.system() == "Darwin":
-                browser = webdriver.PhantomJS()
-            else:
-                browser = webdriver.PhantomJS('/home/ubuntu/Trial/price-visualiser/phantomjs')
-            browser.get(url_string)
-            browser.execute_script("return document.cookie")
-            browser.execute_script("return navigator.userAgent")
-            html_source = browser.page_source
-            browser.close()
-            requestTime = clock() - startTime
-            print "\tTook " + str(requestTime) + " time to get response."
+        for url in url_list:
+            try:
+                self.browser.get(url)
+                break
+            except AttributeError:
+                continue
+            except:
+                print "Error getting URL."
+        self.browser.execute_script("return document.cookie")
+        self.browser.execute_script("return navigator.userAgent")
+        html_source = self.browser.page_source
 
-            soup = BeautifulSoup(html_source)
+        requestTime = time() - startTime
+        print "\tTook %.2f seconds to get response." % requestTime
 
+        soup = BeautifulSoup(html_source)
+        if url == url_list[0]:
             prices_table = soup.find("table").find("tbody")
             current_price = prices_table.find_all("td")[0].get_text()
+        elif url == url_list[1]:
+            search_id_string = "yfs_l84_" + code + ".ax"
+            current_price = soup.find(id=search_id_string).get_text()
 
-        except AttributeError:
-            try:
-                print "\tERROR using asx, using yahoo instead."
-                url_string = "https://au.finance.yahoo.com/q/pr?s=" + code + ".AX"
-
-                if platform.system() == "Darwin":
-                    browser = webdriver.PhantomJS()
-                else:
-                    browser = webdriver.PhantomJS('/home/ubuntu/Trial/price-visualiser/phantomjs')
-
-                browser.get(url_string)
-                browser.execute_script("return document.cookie")
-                browser.execute_script("return navigator.userAgent")
-                html_source = browser.page_source
-                browser.close()
-
-                soup = BeautifulSoup(html_source)
-
-                search_id_string = "yfs_l84_" + code + ".ax"
-                current_price = soup.find(id=search_id_string).get_text()
-            except AttributeError:
-                print "Attribute Error: bs4.find() could not retrieve text for %s." % asx_codes_array[i]
-                print "Check the status of the webpage."
-                pass
-
-        scrapeTime = clock() - startTime
         print "\t" + code + "\t" + current_price
-        print "\tTime to scrape: " + str(scrapeTime)
+
         price_log = PriceLog(
             asx_code=code,
             price=current_price,
             timestamp=datetime.datetime.now()
         )
 
-        price_log.save()
-        finishTime = clock() - startTime
-        print "\tSaved in database. Total time taken: " + str(finishTime)
+        try:
+            price_log.save()
+        except:
+            print "Error saving to database."
+
+        finishTime = time() - startTime
+        print "\tSaved in database. Total time: %.2f" % finishTime
         return 0
 
     def historic_data_grab(self, code):
