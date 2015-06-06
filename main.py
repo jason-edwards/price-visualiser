@@ -103,8 +103,8 @@ class MyDaemon(Daemon):
         web_service()
 
 if __name__ == "__main__":
-
-    if len(sys.argv) == 2:
+    argc = len(sys.argv)
+    if argc == 2:
         daemon = MyDaemon('/tmp/daemon-example.pid')
         if 'start' == sys.argv[1]:
             print "Starting as daemon."
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         else:
             print "Unknown command"
             sys.exit(2)
-    elif len(sys.argv) == 3:
+    elif argc == 3:
         if 'history' == sys.argv[1]:
             data_grabber = DataGrabber()
             result = data_grabber.historic_data_grab(sys.argv[2])
