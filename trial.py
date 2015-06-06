@@ -44,8 +44,6 @@ class DataGrabber():
             try:
                 self.browser.get(url)
                 break
-            except AttributeError:
-                continue
             except:
                 print "Error getting URL."
         self.browser.execute_script("return document.cookie")
@@ -56,14 +54,14 @@ class DataGrabber():
         print "\tTook %.2f seconds to get response." % requestTime
 
         soup = BeautifulSoup(html_source)
-        if soup is None:
-            print "Error making soup."
-            print html_source
-            return 1
 
         if url == url_list[0]:
-            prices_table = soup.find("table").find("tbody")
-            current_price = prices_table.find_all("td")[0].get_text()
+            try:
+                prices_table = soup.find("table").find("tbody")
+                current_price = prices_table.find_all("td")[0].get_text()
+            except AttributeError:
+                print "Unable to scrape this time."
+                return 1
         elif url == url_list[1]:
             search_id_string = "yfs_l84_" + code + ".ax"
             current_price = soup.find(id=search_id_string).get_text()
