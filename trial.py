@@ -84,7 +84,7 @@ class DataGrabber():
 
         scrapeTime = clock() - startTime
         print "\t" + code + "\t" + current_price
-        print "\tTime to scrape: " + scrapeTime
+        print "\tTime to scrape: " + str(scrapeTime)
         price_log = PriceLog(
             asx_code=code,
             price=current_price,
