@@ -79,9 +79,12 @@ class DataGrabThread(threading.Thread):
         asx_codes_array = ["anz", "cba", "wbc", "cim"]
         #asx_codes_array = ["cba"]
         data_grabber = DataGrabber()
+        print "Starting datagrab thread loop. This message should only appear once."
         while self.keep_running:
             for asx_code in asx_codes_array:
+                print "Executing datagrab(" + asx_code + ")"
                 data_grabber.data_grab(asx_code)
+            print "Sleeping thread."
             time.sleep(5)
 
 

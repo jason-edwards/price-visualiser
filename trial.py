@@ -33,10 +33,11 @@ class DataGrabber():
         pass
 
     def data_grab(self, code):
-        print "*Datagrab for " + code + " *"
+        print "** Datagrab beginning for " + code + " **"
         startTime = clock()
         current_price = 0
         try:
+            print "Getting asx price."
             url_string = "http://search.asx.com.au/s/search.html?query=" + code + "&collection=asx-meta&profile=web"
 
             if platform.system() == "Darwin":
@@ -56,6 +57,7 @@ class DataGrabber():
 
         except AttributeError:
             try:
+                print "\tERROR using asx, using yahoo instead."
                 url_string = "https://au.finance.yahoo.com/q/pr?s=" + code + ".AX"
 
                 if platform.system() == "Darwin":
