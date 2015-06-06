@@ -7,6 +7,7 @@ import platform
 import re
 import csv
 import urllib2
+from time import clock
 
 
 DATABASE_USER = 'pricevis'
@@ -32,6 +33,8 @@ class DataGrabber():
         pass
 
     def data_grab(self, code):
+        print "*Datagrab for " + code + " *"
+        startTime = clock()
         current_price = 0
         try:
             url_string = "http://search.asx.com.au/s/search.html?query=" + code + "&collection=asx-meta&profile=web"
@@ -74,8 +77,8 @@ class DataGrabber():
                 print "Attribute Error: bs4.find() could not retrieve text for %s." % asx_codes_array[i]
                 print "Check the status of the webpage."
                 pass
-
-        print(code, current_price)
+        scrapeTime = clock() - startTime
+        print "\t" + code + "\t" + current_price + "\t" + str(scapeTime)
 
         price_log = PriceLog(
             asx_code=code,
@@ -84,6 +87,8 @@ class DataGrabber():
         )
 
         price_log.save()
+        finishTime = clock() - startTime
+        print "\tSaved in database. Total time taken: " + str(finishTime)
         return 0
 
     def historic_data_grab(self, code):
