@@ -56,7 +56,7 @@ class DataGrabber():
         print "\tTook %.2f seconds to get response." % requestTime
 
         soup = BeautifulSoup(html_source)
-        if soup == None:
+        if soup is None:
             print "Error making soup."
             print html_source
             return 1
