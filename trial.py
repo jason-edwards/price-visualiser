@@ -37,7 +37,7 @@ class DataGrabber():
         startTime = clock()
         current_price = 0
         try:
-            print "Getting asx price."
+            print "\tGetting asx price."
             url_string = "http://search.asx.com.au/s/search.html?query=" + code + "&collection=asx-meta&profile=web"
 
             if platform.system() == "Darwin":
@@ -49,6 +49,8 @@ class DataGrabber():
             browser.execute_script("return navigator.userAgent")
             html_source = browser.page_source
             browser.close()
+            requestTime = clock() - startTime
+            print "\tTook " + str(requestTime) + " time to get response."
 
             soup = BeautifulSoup(html_source)
 
@@ -79,9 +81,10 @@ class DataGrabber():
                 print "Attribute Error: bs4.find() could not retrieve text for %s." % asx_codes_array[i]
                 print "Check the status of the webpage."
                 pass
-        scrapeTime = clock() - startTime
-        print "\t" + code + "\t" + current_price + "\t" + str(scrapeTime)
 
+        scrapeTime = clock() - startTime
+        print "\t" + code + "\t" + current_price
+        print "\tTime to scrape: " + scrapeTime
         price_log = PriceLog(
             asx_code=code,
             price=current_price,

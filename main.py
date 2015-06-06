@@ -104,6 +104,7 @@ class MyDaemon(Daemon):
 
 if __name__ == "__main__":
     argc = len(sys.argv)
+
     if argc == 2:
         daemon = MyDaemon('/tmp/daemon-example.pid')
         if 'start' == sys.argv[1]:
@@ -137,8 +138,7 @@ if __name__ == "__main__":
             print "Check if code is valid."
     else:
         print "Not running as daemon!"
-        print "usage: %s start|stop|restart" % sys.argv[0]
-        print '\n'
+        print "usage: %s start|stop|restart\n" % sys.argv[0]
 
         datagrab_thread = DataGrabThread()
         datagrab_thread.start()
