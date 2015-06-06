@@ -60,7 +60,11 @@ class DataGrabber():
                 prices_table = soup.find("table").find("tbody")
                 current_price = prices_table.find_all("td")[0].get_text()
             except AttributeError:
+<<<<<<< HEAD
                 print "\tUnable to scrape this time."
+=======
+                print "Unable to scrape this time."
+>>>>>>> dbb9de9635862fcdedb19775e6a6e7b92d9ae1dc
                 return 1
         elif url == url_list[1]:
             search_id_string = "yfs_l84_" + code + ".ax"
