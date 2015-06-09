@@ -28,9 +28,6 @@ if __name__ == "__main__":
         elif 'restart' == sys.argv[1]:
             print "Restarting as daemon."
             daemon.restart()
-        elif 'history' == sys.argv[1]:
-            print "usage: %s history code" % sys.argv[0]
-            sys.exit(2)
         else:
             print "usage: %s start|stop|restart\n" % sys.argv[0]
             sys.exit(2)
