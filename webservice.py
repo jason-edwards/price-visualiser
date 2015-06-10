@@ -2,6 +2,7 @@ __author__ = 'jason'
 
 from flask import Flask, request, redirect
 from daemon import Daemon
+import platform
 import sys
 import platform
 
