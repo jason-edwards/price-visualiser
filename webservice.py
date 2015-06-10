@@ -20,7 +20,7 @@ if __name__ == "__main__":
     argc = len(sys.argv)
 
     if argc == 2:
-        daemon = MyDaemon('/tmp/daemon-example.pid')
+        daemon = MyDaemon('/tmp/webservices.pid')
         if 'start' == sys.argv[1]:
             print "Starting as daemon."
             daemon.start()
