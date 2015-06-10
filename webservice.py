@@ -3,11 +3,26 @@ __author__ = 'jason'
 from flask import Flask, request, redirect
 from daemon import Daemon
 import sys
+import platform
 
 
 WEB_PORT = 5000 if platform.system() == "Darwin" else 80
 app = Flask(__name__)
 #app.debug = True
+
+
+@app.route("/json/", methods=['POST'])
+def route_json():
+    json_request = request.get_json(force=True)
+    if json_request is None or len(json_request) == 0:
+        return "Error parsing JSON request. Request was empty."
+    if 'asx_code' not in json_request:
+        return "Request must contain 'asx_code' and value."
+    if 'values' in json_request:
+        start_date = json_request.get('start_date')
+        end_date = json_request.get('end_date')
+        
+    return str(json_request['asx_code'])
 
 
 class MyDaemon(Daemon):
