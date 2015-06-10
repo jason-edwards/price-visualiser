@@ -13,6 +13,7 @@ WEB_PORT = 5000 if platform.system() == "Darwin" else 80
 app = Flask(__name__)
 #app.debug = True
 
+db = DBConnector()
 
 @app.route("/json/", methods=['POST'])
 def route_json():
@@ -37,10 +38,9 @@ def route_json():
                 end_date = datetime.datetime.strptime(json_request['end_date'], "%Y-%m-%d %H:%M:%S")
             except TypeError:
                 return "Unable to parse 'end_date' : %s" % str(json_request['end_date'])
-        
-
-        
-    return str(json_request['asx_code'])
+        result = db.get_pricelog_record(json_request['asx_code'])
+        print result
+    return "Success"
 
 
 class MyDaemon(Daemon):
