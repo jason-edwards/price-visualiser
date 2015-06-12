@@ -31,7 +31,7 @@ class DBConnector():
         else:
             if end_time is None:
                 end_time = datetime.datetime.now()
-            else:
+            elif type(end_time) is not datetime:
                 try:
                     end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d")
                 except TypeError:
@@ -39,7 +39,7 @@ class DBConnector():
 
             if start_time is None:
                 start_time = end_time - datetime.timedelta(days=90)
-            else:
+            elif type(start_time) is not datetime:
                 try:
                     start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d")
                 except TypeError:
