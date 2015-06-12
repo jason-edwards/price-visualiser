@@ -3,6 +3,8 @@ __author__ = 'jason'
 from selenium import webdriver
 import requests as req
 from daemon import Daemon
+from url_yahoo_finance import URLYahooFinance
+from url_asx import URLAsx
 import platform
 import datetime
 import sys
@@ -46,36 +48,18 @@ class DataGrabber():
 
     def price_grab(self, code):
         start_time = time()
-        current_price = 0
-        url_list = ["http://search.asx.com.au/s/search.html?query=%s&collection=asx-meta&profile=web" % code,
-                    "https://au.finance.yahoo.com/q/pr?s=%s.AX" % code]
-        print "\tGetting asx price."
 
-        for url in url_list:
+        url_container_list = [URLAsx(asx_code=code), URLYahooFinance(asx_code=code)]
+
+        for url_container in url_container_list:
             try:
-                self.browser.get(url)
+                current_price = url_container.get_price()
                 break
-            except:
-                print "Error getting URL."
-        self.browser.execute_script("return document.cookie")
-        self.browser.execute_script("return navigator.userAgent")
-        html_source = self.browser.page_source
+            except LookupError:
+                continue
 
         request_time = time() - start_time
         print "\tTook %.2f seconds to get response." % request_time
-
-        soup = BeautifulSoup(html_source)
-
-        if url == url_list[0]:
-            try:
-                prices_table = soup.find("table").find("tbody")
-                current_price = prices_table.find_all("td")[0].get_text()
-            except AttributeError:
-                print "\tUnable to scrape this time."
-                return 1
-        elif url == url_list[1]:
-            search_id_string = "yfs_l84_%s.ax" % code
-            current_price = soup.find(id=search_id_string).get_text()
 
         print "\t%s\t%s" % (code, current_price)
 
