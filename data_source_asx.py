@@ -1,11 +1,11 @@
 __author__ = 'jason'
 
-from url_container import URLContainer
+from data_source import DataSource
 
 
-class URLAsx(URLContainer):
+class SourceASX(DataSource):
     def __init__(self, asx_code):
-        URLContainer.__init__(self, asx_code=asx_code, javascript=True)
+        DataSource.__init__(self, asx_code=asx_code, javascript=True)
 
     def get_price(self):
         url = "http://search.asx.com.au/s/search.html?query=%s&collection=asx-meta&profile=web" % self.asx_code

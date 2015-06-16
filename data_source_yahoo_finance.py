@@ -1,12 +1,12 @@
 __author__ = 'jason'
 
-from url_container import URLContainer
+from data_source import DataSource
 import re
 
 
-class URLYahooFinance(URLContainer):
+class SourceYahooFinance(DataSource):
     def __init__(self, asx_code):
-        URLContainer.__init__(self, asx_code=asx_code, javascript=False)
+        DataSource.__init__(self, asx_code=asx_code, javascript=False)
 
     def get_price(self):
         url = "https://au.finance.yahoo.com/q/pr?s=%s.AX" % self.asx_code
@@ -32,3 +32,7 @@ class URLYahooFinance(URLContainer):
             return None
 
         return file_url
+
+    def get_key_statistics(self):
+        pass
+    

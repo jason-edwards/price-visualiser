@@ -5,7 +5,7 @@ import platform
 import requests as req
 from bs4 import BeautifulSoup
 
-class URLContainer():
+class DataSource():
     def __init__(self, asx_code, javascript=True):
         if javascript:
             if platform.system() != "Darwin":
