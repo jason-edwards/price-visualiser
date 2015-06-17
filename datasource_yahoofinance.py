@@ -1,10 +1,10 @@
 __author__ = 'jason'
 
-from data_source import DataSource
+from datasource import DataSource
 import re
 
 
-class SourceYahooFinance(DataSource):
+class DataSource_YahooFinance(DataSource):
     def __init__(self, asx_code):
         DataSource.__init__(self, asx_code=asx_code, javascript=False)
 

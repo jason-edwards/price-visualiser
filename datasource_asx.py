@@ -1,9 +1,9 @@
 __author__ = 'jason'
 
-from data_source import DataSource
+from datasource import DataSource
 
 
-class SourceASX(DataSource):
+class DataSource_ASX(DataSource):
     def __init__(self, asx_code):
         DataSource.__init__(self, asx_code=asx_code, javascript=True)
 
