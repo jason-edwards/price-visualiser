@@ -10,6 +10,8 @@ import sys
 WEB_PORT = 5000 if platform.system() == "Darwin" else 80
 DATAGRAB_SLEEP_TIME = 10 # seconds between each round of data grabbing
 
+# Test text (jasons)
+
 app = Flask(__name__)
 #app.debug = True
 datagrab_thread = None
