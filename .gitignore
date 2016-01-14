@@ -58,3 +58,6 @@ target/
 
 *.passwd
 .idea
+venv/
+venv_activate.bat
+venv_deactivate.bat
