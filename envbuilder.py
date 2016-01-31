@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import os.path
 from subprocess import Popen, PIPE
