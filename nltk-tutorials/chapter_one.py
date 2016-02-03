@@ -13,8 +13,11 @@ import nltk
 import nltk.book as nltk_book
 
 
-def main():
-    section_one()
+def main() -> int:
+    #section_one()
+    #section_two()
+    section_three()
+    return 0
 
 
 def section_one():
@@ -30,6 +33,56 @@ def section_one():
     # text3_token_set()
     print(lexical_diversity(nltk_book.text3))
     print(token_density("smote", nltk_book.text3))
+
+
+def section_two() -> int:
+    # This is not strictly correct as sent1 is not of type nltk.text.Text
+    print(lexical_diversity(nltk_book.sent1))
+    return 0
+
+
+def section_three() -> int:
+    # print(most_common_tokens(nltk_book.text3, 20))
+    # print(common_bigrams(nltk_book.text3, 30))
+    # nltk_book.text4.collocations(num=40)
+    print(rare_token_bigrams(nltk_book.text5, 10, 40))
+    return 0
+
+
+def rare_token_bigrams(text: nltk.text.Text, bigram_counter: int, token_pos_start: int) -> dict:
+    # If the bigrams does not contain a most common token then append bigram to list
+    # Calculate a frequency distribution from this.
+    bigram_list = list(nltk.bigrams(lowercase_text(text)))
+    common_tokens = [token[0] for token in most_common_tokens(text, token_pos_start)]
+
+    rare_token_bigram_list = []
+
+    for bigram in bigram_list:
+        if bigram[0] in common_tokens:
+            continue
+        elif bigram[1] in common_tokens:
+            continue
+        else:
+            rare_token_bigram_list.append(bigram)
+
+    rare_token_bigram_freq = nltk.FreqDist(rare_token_bigram_list)
+    return rare_token_bigram_freq.most_common(bigram_counter)
+
+
+def common_bigrams(text: nltk.text.Text, bigram_counter: int) -> list:
+    bigrams_list = list(nltk.bigrams(lowercase_text(text)))
+    bigrams_freq_dist = nltk.FreqDist(bigrams_list)
+    return bigrams_freq_dist.most_common(bigram_counter)
+
+
+def most_common_tokens(text: nltk.text.Text, token_counter: int) -> list:
+    fdist = nltk.FreqDist(lowercase_text(text))
+    # fdist.plot(token_counter, cumulative=True)
+    return fdist.most_common(token_counter)
+
+
+def lowercase_text(text: nltk.text.Text) -> list:
+    return [token.lower() for token in text]
 
 
 def print_titles():
