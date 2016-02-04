@@ -14,9 +14,12 @@ import nltk.book as nltk_book
 
 
 def main() -> int:
-    #section_one()
-    #section_two()
-    section_three()
+    # section_one()
+    # section_two()
+    # section_three()
+    # section_four()
+    # section_five()
+    practice_questions()
     return 0
 
 
@@ -37,6 +40,7 @@ def section_one():
 
 def section_two() -> int:
     # This is not strictly correct as sent1 is not of type nltk.text.Text
+    print(type(nltk_book.sent1))
     print(lexical_diversity(nltk_book.sent1))
     return 0
 
@@ -47,6 +51,36 @@ def section_three() -> int:
     # nltk_book.text4.collocations(num=40)
     print(rare_token_bigrams(nltk_book.text5, 10, 40))
     return 0
+
+
+def section_four() -> int:
+    print(tokens_ending_with('l', nltk_book.sent1))
+    return 0
+
+
+def section_five() -> int:
+    nltk.chat.chatbots()
+    return 0
+
+
+def practice_questions() -> int:
+    n_letter_token_list = n_letter_tokens(4, nltk_book.text5)
+    print(most_common_tokens(n_letter_token_list, 100))
+    return 0
+
+
+def n_letter_tokens(letter_count: int, token_list: list) -> list:
+    n_letter_token_list = []
+    for token in token_list:
+        if len(token) == letter_count:
+            n_letter_token_list.append(token)
+
+    return n_letter_token_list
+
+
+def tokens_ending_with(letter: str, token_list: list) -> list:
+    token_list_out = [token for token in token_list if token.endswith(letter)]
+    return token_list_out
 
 
 def rare_token_bigrams(text: nltk.text.Text, bigram_counter: int, token_pos_start: int) -> dict:
@@ -77,7 +111,7 @@ def common_bigrams(text: nltk.text.Text, bigram_counter: int) -> list:
 
 def most_common_tokens(text: nltk.text.Text, token_counter: int) -> list:
     fdist = nltk.FreqDist(lowercase_text(text))
-    # fdist.plot(token_counter, cumulative=True)
+    fdist.plot(token_counter, cumulative=True)
     return fdist.most_common(token_counter)
 
 
