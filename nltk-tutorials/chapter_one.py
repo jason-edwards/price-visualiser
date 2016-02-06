@@ -66,6 +66,7 @@ def section_five() -> int:
 def practice_questions() -> int:
     n_letter_token_list = n_letter_tokens(4, nltk_book.text5)
     print(most_common_tokens(n_letter_token_list, 100))
+    print(rare_token_bigrams(nltk.corpus.nps_chat.words(), 50, 100))
     return 0
 
 
