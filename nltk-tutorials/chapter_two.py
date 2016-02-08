@@ -1,10 +1,14 @@
 __author__ = 'jason'
 
+from nltk.corpus.reader.plaintext import PlaintextCorpusReader
+from nltk.corpus import brown
 import nltk
+
 # import nltk.book as nltk_book
 
 def main() -> int:
-    section_one()
+    # section_one()
+    section_two()
     return 0
 
 
@@ -17,18 +21,47 @@ def section_one() -> int:
     return 0
 
 
-def token_counter(
-        file_name: str,
-        corpus: nltk.corpus.reader.plaintext.PlaintextCorpusReader
-        ) -> int:
+def section_two() -> int:
+    genres = ['news', 'government']
+    cfd = cfd_genre_brown(genres)
+    conditions = cfd.conditions()
+    news_words = [tokens[0] for tokens in cfd['news'].most_common(20)]
+    cfd.tabulate(conditions=conditions, samples=news_words, cumulative=True)
+    print("----------------------------------------")
+    government_words = [tokens[0] for tokens in cfd['government'].most_common(20)]
+    cfd.tabulate(conditions=conditions, samples=government_words, cumulative=True)
+    print("----------------------------------------")
+    text = brown.words(brown.fileids()[0])
+    bigrams = nltk.bigrams(text)
+    cfd = nltk.ConditionalFreqDist(bigrams)
+    generate_model(cfd, text[21])
+
+    return 0
+
+
+def generate_model(cfdist, word, num=15) -> int:
+    for i in range(num):
+        print(word, end=' ')
+        word = cfdist[word].max()
+
+    return 0
+
+def cfd_genre_brown(genres: list) -> int:
+    genre_word = []
+    for genre in genres:
+        for word in brown.words(categories=genre):
+            genre_word.append((genre, word))
+    cfd = nltk.ConditionalFreqDist(genre_word)
+    return cfd
+
+
+def token_counter(file_name: str, corpus: PlaintextCorpusReader) -> int:
     corpora = nltk.corpus.__getattr__(corpus)
     token_count = len(corpora.words(file_name))
     return token_count
 
 
-def corpus_file_info(
-        corpus: nltk.corpus.reader.plaintext.PlaintextCorpusReader
-        ) -> int:
+def corpus_file_info(corpus: PlaintextCorpusReader) -> int:
     corpora = nltk.corpus.__getattr__(corpus)
 
     for fileid in corpora.fileids():
