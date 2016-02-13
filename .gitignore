@@ -56,5 +56,10 @@ docs/_build/
 # PyBuilder
 target/
 
+# Visual Studio
+bin/
+obj/
+*.suo
+
 *.passwd
 .idea
