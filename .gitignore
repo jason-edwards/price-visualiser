@@ -60,6 +60,7 @@ target/
 bin/
 obj/
 *.suo
+*.pyproj
 
 *.passwd
 .idea
