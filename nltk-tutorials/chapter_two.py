@@ -2,13 +2,20 @@ __author__ = 'jason'
 
 from nltk.corpus.reader.plaintext import PlaintextCorpusReader
 from nltk.corpus import brown
+from nltk.corpus import wordnet as wn
 import nltk
+import numpy as np
+import matplotlib.pyplot as plt
+import random
 
 # import nltk.book as nltk_book
 
 def main() -> int:
     # section_one()
-    section_two()
+    # section_two()
+    # section_four()
+    # section_five()
+    practice_questions()
     return 0
 
 
@@ -37,6 +44,58 @@ def section_two() -> int:
     generate_model(cfd, text[21])
 
     return 0
+
+
+def section_four() -> int:
+    print(unusual_words(brown.words()))
+    return 0
+
+
+def section_five() -> int:
+    list_synsets('home')
+    return 0
+
+
+def practice_questions() -> int:
+    # zipf_law(brown.words())
+    random_text = random_text_gen(5000000)
+    zipf_law(random_text)
+    return 0
+
+
+def random_text_gen(len: int) -> str:
+
+    string = ''
+    for index in range(len):
+        string += random.choice("abcdefghijkl ")
+
+    text = string.split(' ')
+    return text
+
+
+def zipf_law(text: list) -> int:
+    fdist = nltk.FreqDist(text)
+    sorted_list = sorted(fdist.values(), reverse=True)
+    ln_x = [np.log(x) for x in range(1, len(sorted_list)+1)]
+    plt.plot(ln_x, sorted_list)
+    ln_sorted_list = [np.log(y) for y in sorted_list]
+    # plt.plot(ln_sorted_list)
+    plt.show()
+    return 0
+
+
+def list_synsets(token: str) -> int:
+    for synset in wn.synsets(token):
+        print(synset.lemma_names())
+
+    return 0
+
+
+def unusual_words(text: list) -> list:
+    text_vocab = set(w.lower() for w in text if w.isalpha())
+    english_vocab = set(w.lower() for w in nltk.corpus.words.words())
+    unusual = text_vocab - english_vocab
+    return sorted(unusual)
 
 
 def generate_model(cfdist, word, num=15) -> int:
